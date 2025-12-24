@@ -1,0 +1,25 @@
+{
+  "folders": [
+    {
+      "id": "Chem_data_test",
+      "name": "🧪 Химия",
+      "tests": [
+        { "name": "Тест P1b", "file": "Chem_data_test/Chem_test_P1b.json" },
+        { "name": "Тест P2", "file": "Chem_data_test/Chem_test_P2.json" },
+        { "name": "Тест P4 (Mistral)", "file": "Chem_data_test/Chem_test_P4_Mistral.json" }
+      ]
+    },
+    {
+      "id": "Phis_data_test",
+      "name": "⚛️ Физика",
+      "tests": [
+        { "name": "Тест P14", "file": "Phis_data_test/test_P14.json" },
+        { "name": "Тест P14 (альтернатива)", "file": "Phis_data_test/testP14.json" },
+        { "name": "Тест P14-2", "file": "Phis_data_test/test14_2.json" },
+        { "name": "Тест P15 (Cursor)", "file": "Phis_data_test/test_P15Cursor.json" },
+        { "name": "Тест P15-16", "file": "Phis_data_test/testP15_16.json" },
+        { "name": "Тест P17-18", "file": "Phis_data_test/testP17_18.json" }
+      ]
+    }
+  ]
+}

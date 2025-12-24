@@ -131,14 +131,7 @@
                 <h2 class="modal-title">Выберите тест</h2>
                 <button class="modal-close" onclick="closeTestModal()">&times;</button>
             </div>
-            <div class="folder-tabs">
-                <div class="folder-tab active" data-folder="Chem_data_test" onclick="selectFolder('Chem_data_test')">
-                    🧪 Химия
-                </div>
-                <div class="folder-tab" data-folder="Phis_data_test" onclick="selectFolder('Phis_data_test')">
-                    ⚛️ Физика
-                </div>
-            </div>
+            <div id="folder-tabs" class="folder-tabs"></div>
             <div id="test-list" class="test-list"></div>
         </div>
     </div>
@@ -199,40 +192,64 @@
     let startTime;
     let timerInterval;
     let userResults = [];
-    let currentFolder = 'Chem_data_test';
+    let currentFolder = null;
+    let testConfig = null;
 
     // Для логики сопоставления
     let selectedLeft = null;
     let currentPairs = [];
 
-    // Списки тестов в папках
-    const testFolders = {
-        'Chem_data_test': [
-            { name: 'Тест P1', file: 'Chem_data_test/Chem_test_P1.json' },
-            { name: 'Тест P1а', file: 'Chem_data_test/Chem_test_P1а.json' },
-            { name: 'Тест P1b', file: 'Chem_data_test/Chem_test_P1b.json' },
-            { name: 'Тест P2', file: 'Chem_data_test/Chem_test_P2.json' },
-            { name: 'Тест P2 (LMstudio)', file: 'Chem_data_test/Chem_test_P2_LMstudio.json' },
-            { name: 'Тест P3 (Kimi)', file: 'Chem_data_test/Chem_test_P3_Kimi.json' },
-            { name: 'Тест P4 (Mistral)', file: 'Chem_data_test/Chem_test_P4_Mistral.json' }
-        ],
-        'Phis_data_test': [
-            { name: 'Тест P14', file: 'Phis_data_test/test_P14.json' },
-            { name: 'Тест P14 (альтернатива)', file: 'Phis_data_test/testP14.json' },
-            { name: 'Тест P14-2', file: 'Phis_data_test/test14_2.json' },
-            { name: 'Тест P15 (Cursor)', file: 'Phis_data_test/test_P15Cursor.json' },
-            { name: 'Тест P15-16', file: 'Phis_data_test/testP15_16.json' },
-            { name: 'Тест P17-18', file: 'Phis_data_test/testP17_18.json' },
-            { name: 'Тест Напряжение', file: 'Phis_data_test/testNapriajenie.json' }
-        ]
-    };
+    /**
+     * 0. ЗАГРУЗКА КОНФИГУРАЦИИ
+     */
+    async function loadConfig() {
+        try {
+            const response = await fetch('tests_config.json');
+            if (!response.ok) {
+                throw new Error(`Ошибка загрузки конфигурации: ${response.status}`);
+            }
+            testConfig = await response.json();
+            
+            // Создаем вкладки папок
+            renderFolderTabs();
+            
+            // Устанавливаем первую папку как активную
+            if (testConfig.folders && testConfig.folders.length > 0) {
+                currentFolder = testConfig.folders[0].id;
+            }
+        } catch (err) {
+            console.error('Ошибка при загрузке конфигурации:', err);
+            alert('Ошибка при загрузке конфигурации тестов: ' + err.message);
+        }
+    }
+
+    function renderFolderTabs() {
+        const tabsContainer = document.getElementById('folder-tabs');
+        tabsContainer.innerHTML = '';
+        
+        if (!testConfig || !testConfig.folders) return;
+        
+        testConfig.folders.forEach((folder, index) => {
+            const tab = document.createElement('div');
+            tab.className = 'folder-tab' + (index === 0 ? ' active' : '');
+            tab.dataset.folder = folder.id;
+            tab.innerText = folder.name;
+            tab.onclick = () => selectFolder(folder.id);
+            tabsContainer.appendChild(tab);
+        });
+    }
 
     /**
      * 1. МОДАЛЬНОЕ ОКНО ВЫБОРА ТЕСТА
      */
-    function openTestModal() {
+    async function openTestModal() {
+        if (!testConfig) {
+            await loadConfig();
+        }
         document.getElementById('test-modal').classList.add('active');
-        renderTestList(currentFolder);
+        if (currentFolder) {
+            renderTestList(currentFolder);
+        }
     }
 
     function closeTestModal() {
@@ -254,8 +271,10 @@
         const testList = document.getElementById('test-list');
         testList.innerHTML = '';
         
-        const tests = testFolders[folder] || [];
-        tests.forEach(test => {
+        const folderData = testConfig.folders.find(f => f.id === folder);
+        if (!folderData || !folderData.tests) return;
+        
+        folderData.tests.forEach(test => {
             const item = document.createElement('div');
             item.className = 'test-item';
             item.innerHTML = `
