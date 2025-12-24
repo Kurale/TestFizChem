@@ -77,6 +77,42 @@
             font-weight: bold; margin-top: 20px; transition: 0.3s;
         }
         .file-upload-btn:hover { opacity: 0.9; transform: scale(1.05); }
+
+        /* Модальное окно */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: flex; justify-content: center;
+            align-items: center; z-index: 1000; opacity: 0; visibility: hidden;
+            transition: 0.3s;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal {
+            background: white; border-radius: 20px; padding: 30px;
+            width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2); transform: scale(0.9);
+            transition: 0.3s;
+        }
+        .modal-overlay.active .modal { transform: scale(1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-title { font-size: 24px; font-weight: bold; margin: 0; }
+        .modal-close { background: none; border: none; font-size: 28px; cursor: pointer; color: #999; }
+        .modal-close:hover { color: var(--danger); }
+        .folder-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .folder-tab {
+            flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 10px;
+            background: #f9f9f9; cursor: pointer; font-weight: 500; text-align: center;
+            transition: 0.2s;
+        }
+        .folder-tab:hover { border-color: var(--primary); }
+        .folder-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .test-list { display: flex; flex-direction: column; gap: 10px; }
+        .test-item {
+            padding: 15px; border: 2px solid #eee; border-radius: 10px;
+            cursor: pointer; transition: 0.2s; background: #fff;
+        }
+        .test-item:hover { border-color: var(--primary); background: #f8f9ff; }
+        .test-item-name { font-weight: 500; }
+        .test-item-path { font-size: 12px; color: #888; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -84,11 +120,27 @@
 <div id="app">
     <div id="start-screen" class="welcome-screen">
         <h1>🎓 Система Тестирования</h1>
-        <p>Для начала работы загрузите файл теста из папки <b>data_test</b></p>
-        <label class="file-upload-btn">
-            Открыть файл теста
-            <input type="file" id="file-input" accept=".json,.txt" class="hidden">
-        </label>
+        <p>Для начала работы выберите тест из папок <b>Chem_data_test</b> или <b>Phis_data_test</b></p>
+        <button class="file-upload-btn" onclick="openTestModal()">Открыть файл теста</button>
+    </div>
+
+    <!-- Модальное окно выбора теста -->
+    <div id="test-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Выберите тест</h2>
+                <button class="modal-close" onclick="closeTestModal()">&times;</button>
+            </div>
+            <div class="folder-tabs">
+                <div class="folder-tab active" data-folder="Chem_data_test" onclick="selectFolder('Chem_data_test')">
+                    🧪 Химия
+                </div>
+                <div class="folder-tab" data-folder="Phis_data_test" onclick="selectFolder('Phis_data_test')">
+                    ⚛️ Физика
+                </div>
+            </div>
+            <div id="test-list" class="test-list"></div>
+        </div>
     </div>
 
     <div id="quiz-screen" class="hidden">
@@ -131,7 +183,7 @@
             <div class="stats-card" id="stats-summary"></div>
             <div class="history-list" id="questions-log"></div>
         </div>
-        <button onclick="location.reload()" class="btn-opt" style="width:100%; margin-top:20px; text-align:center; background:var(--primary); color:white;">
+        <button onclick="resetAndOpenModal()" class="btn-opt" style="width:100%; margin-top:20px; text-align:center; background:var(--primary); color:white;">
             Загрузить другой тест
         </button>
     </div>
@@ -147,29 +199,110 @@
     let startTime;
     let timerInterval;
     let userResults = [];
+    let currentFolder = 'Chem_data_test';
 
     // Для логики сопоставления
     let selectedLeft = null;
-    let currentPairs = []; 
+    let currentPairs = [];
 
-    const fileInput = document.getElementById('file-input');
+    // Списки тестов в папках
+    const testFolders = {
+        'Chem_data_test': [
+            { name: 'Тест P1', file: 'Chem_data_test/Chem_test_P1.json' },
+            { name: 'Тест P1а', file: 'Chem_data_test/Chem_test_P1а.json' },
+            { name: 'Тест P1b', file: 'Chem_data_test/Chem_test_P1b.json' },
+            { name: 'Тест P2', file: 'Chem_data_test/Chem_test_P2.json' },
+            { name: 'Тест P2 (LMstudio)', file: 'Chem_data_test/Chem_test_P2_LMstudio.json' },
+            { name: 'Тест P3 (Kimi)', file: 'Chem_data_test/Chem_test_P3_Kimi.json' },
+            { name: 'Тест P4 (Mistral)', file: 'Chem_data_test/Chem_test_P4_Mistral.json' }
+        ],
+        'Phis_data_test': [
+            { name: 'Тест P14', file: 'Phis_data_test/test_P14.json' },
+            { name: 'Тест P14 (альтернатива)', file: 'Phis_data_test/testP14.json' },
+            { name: 'Тест P14-2', file: 'Phis_data_test/test14_2.json' },
+            { name: 'Тест P15 (Cursor)', file: 'Phis_data_test/test_P15Cursor.json' },
+            { name: 'Тест P15-16', file: 'Phis_data_test/testP15_16.json' },
+            { name: 'Тест P17-18', file: 'Phis_data_test/testP17_18.json' },
+            { name: 'Тест Напряжение', file: 'Phis_data_test/testNapriajenie.json' }
+        ]
+    };
 
     /**
-     * 1. ЗАГРУЗКА ФАЙЛА
+     * 1. МОДАЛЬНОЕ ОКНО ВЫБОРА ТЕСТА
      */
-    fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+    function openTestModal() {
+        document.getElementById('test-modal').classList.add('active');
+        renderTestList(currentFolder);
+    }
 
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            try {
-                questions = JSON.parse(event.target.result);
-                startQuiz();
-            } catch (err) { alert("Ошибка: Неверный формат файла."); }
-        };
-        reader.readAsText(file);
-    });
+    function closeTestModal() {
+        document.getElementById('test-modal').classList.remove('active');
+    }
+
+    function selectFolder(folder) {
+        currentFolder = folder;
+        document.querySelectorAll('.folder-tab').forEach(tab => {
+            tab.classList.remove('active');
+            if (tab.dataset.folder === folder) {
+                tab.classList.add('active');
+            }
+        });
+        renderTestList(folder);
+    }
+
+    function renderTestList(folder) {
+        const testList = document.getElementById('test-list');
+        testList.innerHTML = '';
+        
+        const tests = testFolders[folder] || [];
+        tests.forEach(test => {
+            const item = document.createElement('div');
+            item.className = 'test-item';
+            item.innerHTML = `
+                <div class="test-item-name">${test.name}</div>
+                <div class="test-item-path">${test.file}</div>
+            `;
+            item.onclick = () => loadTest(test.file);
+            testList.appendChild(item);
+        });
+    }
+
+    /**
+     * 2. ЗАГРУЗКА ТЕСТА
+     */
+    async function loadTest(filePath) {
+        try {
+            const response = await fetch(filePath);
+            if (!response.ok) {
+                throw new Error(`Ошибка загрузки: ${response.status}`);
+            }
+            const data = await response.json();
+            questions = data;
+            closeTestModal();
+            startQuiz();
+        } catch (err) {
+            alert('Ошибка при загрузке теста: ' + err.message);
+        }
+    }
+
+    /**
+     * СБРОС И ОТКРЫТИЕ МОДАЛЬНОГО ОКНА
+     */
+    function resetAndOpenModal() {
+        // Сброс состояния
+        questions = [];
+        currentIndex = 0;
+        score = 0;
+        userResults = [];
+        clearInterval(timerInterval);
+        
+        // Показать стартовый экран и модальное окно
+        document.getElementById('result-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('start-screen').classList.remove('hidden');
+        
+        openTestModal();
+    }
 
     /**
      * 2. ИНИЦИАЛИЗАЦИЯ
