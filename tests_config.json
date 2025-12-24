@@ -14,6 +14,7 @@
       "name": "⚛️ Физика",
       "tests": [
         { "name": "Тест P14", "file": "Phis_data_test/test_P14.json" },
+        { "name": "Тест P19", "file": "Phis_data_test/qwenTest.json" },
         { "name": "Тест P14 (альтернатива)", "file": "Phis_data_test/testP14.json" },
         { "name": "Тест P14-2", "file": "Phis_data_test/test14_2.json" },
         { "name": "Тест P15 (Cursor)", "file": "Phis_data_test/test_P15Cursor.json" },
