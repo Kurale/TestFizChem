@@ -1,0 +1,136 @@
+[
+  {
+    "id": 1,
+    "type": "multiple_choice",
+    "question": "Из атомов какого химического элемента состоят и графит, и алмаз?",
+    "image_url": "https://z-cdn-media.chatglm.cn/files/7a19b87a-5a96-40a2-a2a4-da35cd26a6ed.PNG?auth_key=1866431579-276548ee308e42709ca056cd0d1d7313-0-0875bf41c516cdd259ce272a0be1a5fe",
+    "options": [
+      "Железо (Fe)",
+      "Углерод (C)",
+      "Кремний (Si)",
+      "Сера (S)"
+    ],
+    "correct_answer": "Углерод (C)",
+    "explanation": "Текст указывает: «и графит, и алмаз состоят из атомов одного и того же химического элемента — углерода»."
+  },
+  {
+    "id": 2,
+    "type": "true_false",
+    "statement": "Графит и алмаз имеют одинаковые физические свойства.",
+    "image_url": "https://z-cdn-media.chatglm.cn/files/7a19b87a-5a96-40a2-a2a4-da35cd26a6ed.PNG?auth_key=1866431579-276548ee308e42709ca056cd0d1d7313-0-0875bf41c516cdd259ce272a0be1a5fe",
+    "correct_answer": false,
+    "explanation": "В тексте сказано: «У них разные физические свойства»."
+  },
+  {
+    "id": 3,
+    "type": "matching",
+    "question": "Соотнесите вещества, изображенные на рисунке 1 (простые вещества), с их классом: металл или неметалл.",
+    "image_url": "https://z-cdn-media.chatglm.cn/files/7a19b87a-5a96-40a2-a2a4-da35cd26a6ed.PNG?auth_key=1866431579-276548ee308e42709ca056cd0d1d7313-0-0875bf41c516cdd259ce272a0be1a5fe",
+    "pairs": [
+      {
+        "left": "Серебро (Ag)",
+        "right": "Металл"
+      },
+      {
+        "left": "Сера (S)",
+        "right": "Неметалл"
+      },
+      {
+        "left": "Медь (Cu)",
+        "right": "Металл"
+      },
+      {
+        "left": "Кремний (Si)",
+        "right": "Неметалл"
+      }
+    ],
+    "explanation": "На странице «Простые вещества» приведены примеры металлов (серебро, медь) и неметаллов (кремний, сера)."
+  },
+  {
+    "id": 4,
+    "type": "fill_blank",
+    "question_text": "Мельчайшая частица химического элемента называется _______.",
+    "image_url": "https://z-cdn-media.chatglm.cn/files/7b8a2325-7498-4b19-9dd8-14ed37a3041e.PNG?auth_key=1866431579-7af16a6857da4fb890cc680e8237cac6-0-48c2ba25493333a00e97178fd413ea9a",
+    "correct_answer": "атом",
+    "case_sensitive": false,
+    "explanation": "Определение в тексте: «Атом — мельчайшая частица химического элемента»."
+  },
+  {
+    "id": 5,
+    "type": "multiple_choice",
+    "question": "К какому типу веществ относится хромит, согласно тексту на левой странице?",
+    "image_url": "https://z-cdn-media.chatglm.cn/files/7a19b87a-5a96-40a2-a2a4-da35cd26a6ed.PNG?auth_key=1866431579-276548ee308e42709ca056cd0d1d7313-0-0875bf41c516cdd259ce272a0be1a5fe",
+    "options": [
+      "Простое вещество",
+      "Смесь",
+      "Сложное вещество",
+      "Химический элемент"
+    ],
+    "correct_answer": "Сложное вещество",
+    "explanation": "Текст прямо гласит: «Хромит — это сложное вещество»."
+  },
+  {
+    "id": 6,
+    "type": "true_false",
+    "statement": "Молекула — это наименьшая частица вещества, сохраняющая его химические свойства.",
+    "image_url": "https://z-cdn-media.chatglm.cn/files/7b8a2325-7498-4b19-9dd8-14ed37a3041e.PNG?auth_key=1866431579-7af16a6857da4fb890cc680e8237cac6-0-48c2ba25493333a00e97178fd413ea9a",
+    "correct_answer": true,
+    "explanation": "Текст: «Молекула — мельчайшая частица вещества, сохраняющая его химические свойства»."
+  },
+  {
+    "id": 7,
+    "type": "fill_blank",
+    "question_text": "Простые вещества делятся на две основные группы: металлы и _______.",
+    "image_url": "https://z-cdn-media.chatglm.cn/files/7a19b87a-5a96-40a2-a2a4-da35cd26a6ed.PNG?auth_key=1866431579-276548ee308e42709ca056cd0d1d7313-0-0875bf41c516cdd259ce272a0be1a5fe",
+    "correct_answer": "неметаллы",
+    "case_sensitive": false,
+    "explanation": "В тексте указаны классы простых веществ: «металлы» и «неметаллы»."
+  },
+  {
+    "id": 8,
+    "type": "short_answer",
+    "question": "Какая химическая формула, упомянутая в тексте, соответствует кристаллогидрату?",
+    "image_url": "https://z-cdn-media.chatglm.cn/files/7b8a2325-7498-4b19-9dd8-14ed37a3041e.PNG?auth_key=1866431579-7af16a6857da4fb890cc680e8237cac6-0-48c2ba25493333a00e97178fd413ea9a",
+    "correct_answer": "CuSO4·5H2O",
+    "explanation": "В тексте приводится формула кристаллогидрата: «CuSO4·5H2O»."
+  },
+  {
+    "id": 9,
+    "type": "true_false",
+    "statement": "В тексте перечисляются следующие виды химической связи: ионная, металлическая и ковалентная.",
+    "image_url": "https://z-cdn-media.chatglm.cn/files/7b8a2325-7498-4b19-9dd8-14ed37a3041e.PNG?auth_key=1866431579-7af16a6857da4fb890cc680e8237cac6-0-48c2ba25493333a00e97178fd413ea9a",
+    "correct_answer": true,
+    "explanation": "Текст содержит перечень: «виды химической связи: ионная, металлическая, ковалентная»."
+  },
+  {
+    "id": 10,
+    "type": "multiple_choice",
+    "question": "Какое из перечисленных веществ является неметаллом согласно информации на странице?",
+    "image_url": "https://z-cdn-media.chatglm.cn/files/7a19b87a-5a96-40a2-a2a4-da35cd26a6ed.PNG?auth_key=1866431579-276548ee308e42709ca056cd0d1d7313-0-0875bf41c516cdd259ce272a0be1a5fe",
+    "options": [
+      "Серебро (Ag)",
+      "Медь (Cu)",
+      "Кремний (Si)",
+      "Железо (Fe)"
+    ],
+    "correct_answer": "Кремний (Si)",
+    "explanation": "Кремний (Si) и Сера (S) отнесены к неметаллам, в то время как серебро и медь — к металлам."
+  },
+  {
+    "id": 11,
+    "type": "short_answer",
+    "question": "Что такое вещество, согласно определению, данному в начале левой страницы?",
+    "image_url": "https://z-cdn-media.chatglm.cn/files/7a19b87a-5a96-40a2-a2a4-da35cd26a6ed.PNG?auth_key=1866431579-276548ee308e42709ca056cd0d1d7313-0-0875bf41c516cdd259ce272a0be1a5fe",
+    "correct_answer": "Это то, из чего состоят физические тела",
+    "explanation": "Определение в тексте: «Вещество — это то, из чего состоят физические тела»."
+  },
+  {
+    "id": 12,
+    "type": "fill_blank",
+    "question_text": "Химическая формула KCl, приведенная в тексте, относится к _______ веществам (по типу связи/состава в контексте примеров).",
+    "image_url": "https://z-cdn-media.chatglm.cn/files/7b8a2325-7498-4b19-9dd8-14ed37a3041e.PNG?auth_key=1866431579-7af16a6857da4fb890cc680e8237cac6-0-48c2ba25493333a00e97178fd413ea9a",
+    "correct_answer": "ионным",
+    "case_sensitive": false,
+    "explanation": "Рядом с формулой KCl в тексте упоминается «ионная связь»."
+  }
+]

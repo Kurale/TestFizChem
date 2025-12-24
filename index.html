@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Умная Система Тестирования</title>
+    <style>
+        :root {
+            --primary: #5c6bc0;
+            --secondary: #f3f4f9;
+            --success: #66bb6a;
+            --danger: #ef5350;
+            --text: #2c3e50;
+            --shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+
+        body { 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            background: #eef2f7; color: var(--text); margin: 0; padding: 20px;
+            display: flex; justify-content: center; min-height: 100vh;
+        }
+
+        /* Контейнер приложения */
+        #app { 
+            background: white; width: 100%; max-width: 800px; 
+            border-radius: 20px; box-shadow: var(--shadow); overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Шапка с прогрессом */
+        .quiz-header { padding: 20px 30px; background: white; border-bottom: 1px solid #eee; }
+        .progress-container { width: 100%; height: 8px; background: #eee; border-radius: 10px; margin-top: 10px; overflow: hidden; }
+        #progress-bar { width: 0%; height: 100%; background: var(--primary); transition: 0.5s; }
+
+        /* Основная область */
+        .content { padding: 30px; flex-grow: 1; }
+        .q-image { max-width: 100%; height: auto; border-radius: 12px; margin-bottom: 20px; display: block; border: 1px solid #eee; }
+
+        /* Стили ответов */
+        .options-grid { display: grid; gap: 12px; margin-top: 20px; }
+        .btn-opt { 
+            padding: 15px; border: 2px solid #f0f0f0; border-radius: 12px; 
+            background: var(--secondary); cursor: pointer; transition: 0.2s; 
+            font-size: 16px; text-align: left; font-weight: 500;
+        }
+        .btn-opt:hover { border-color: var(--primary); background: #fff; transform: translateY(-2px); }
+        
+        /* Сопоставление (Matching) */
+        .matching-container { display: flex; gap: 20px; margin-top: 20px; }
+        .matching-column { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+        .match-item { 
+            padding: 10px; border: 1px solid #ddd; border-radius: 8px; 
+            background: #fff; cursor: pointer; font-size: 14px; min-height: 40px;
+            display: flex; align-items: center; justify-content: center; text-align: center;
+        }
+        .match-item.selected { border-color: var(--primary); background: #e8eaf6; box-shadow: 0 0 0 2px var(--primary); }
+        .match-item.paired { opacity: 0.5; cursor: default; background: #f9f9f9; }
+
+        /* Финальный экран */
+        .result-layout { display: flex; gap: 20px; }
+        .stats-card { flex: 1; padding: 20px; background: var(--secondary); border-radius: 15px; }
+        .history-list { flex: 1.5; max-height: 500px; overflow-y: auto; padding-right: 10px; }
+        .history-item { 
+            padding: 15px; border-radius: 12px; margin-bottom: 10px; 
+            border-left: 6px solid #ccc; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .history-item.correct { border-left-color: var(--success); }
+        .history-item.wrong { border-left-color: var(--danger); }
+
+        /* Стили стартового экрана */
+        .welcome-screen { text-align: center; padding: 50px 20px; }
+        .file-upload-btn {
+            background: var(--primary); color: white; padding: 15px 30px;
+            border-radius: 50px; cursor: pointer; display: inline-block;
+            font-weight: bold; margin-top: 20px; transition: 0.3s;
+        }
+        .file-upload-btn:hover { opacity: 0.9; transform: scale(1.05); }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div id="start-screen" class="welcome-screen">
+        <h1>🎓 Система Тестирования</h1>
+        <p>Для начала работы загрузите файл теста из папки <b>data_test</b></p>
+        <label class="file-upload-btn">
+            Открыть файл теста
+            <input type="file" id="file-input" accept=".json,.txt" class="hidden">
+        </label>
+    </div>
+
+    <div id="quiz-screen" class="hidden">
+        <div class="quiz-header">
+            <div style="display: flex; justify-content: space-between; font-weight: bold;">
+                <span id="q-number">Вопрос 1</span>
+                <span id="timer">00:00</span>
+            </div>
+            <div class="progress-container"><div id="progress-bar"></div></div>
+        </div>
+
+        <div class="content">
+            <img id="q-image" class="q-image hidden" src="" alt="Тестовое изображение">
+            <h2 id="q-text" style="margin-top: 0;">Текст вопроса</h2>
+            
+            <div id="options-container" class="options-grid"></div>
+            
+            <div id="input-container" class="hidden">
+                <input type="text" id="text-answer" placeholder="Ваш ответ..." 
+                       style="width:100%; padding:15px; border-radius:12px; border:2px solid #ddd; font-size:16px;">
+                <button onclick="submitTextAnswer()" class="btn-opt" 
+                        style="width:100%; margin-top:15px; background:var(--primary); color:white; text-align:center;">
+                    Ответить
+                </button>
+            </div>
+
+            <div id="matching-container" class="hidden">
+                <p><small>Нажмите на элемент слева, затем на соответствующий элемент справа.</small></p>
+                <div class="matching-container">
+                    <div id="match-left" class="matching-column"></div>
+                    <div id="match-right" class="matching-column"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="result-screen" class="hidden content">
+        <h2 style="text-align: center;">Результаты тестирования</h2>
+        <div class="result-layout">
+            <div class="stats-card" id="stats-summary"></div>
+            <div class="history-list" id="questions-log"></div>
+        </div>
+        <button onclick="location.reload()" class="btn-opt" style="width:100%; margin-top:20px; text-align:center; background:var(--primary); color:white;">
+            Загрузить другой тест
+        </button>
+    </div>
+</div>
+
+<script>
+    /**
+     * ПЕРЕМЕННЫЕ СОСТОЯНИЯ
+     */
+    let questions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let startTime;
+    let timerInterval;
+    let userResults = [];
+
+    // Для логики сопоставления
+    let selectedLeft = null;
+    let currentPairs = []; 
+
+    const fileInput = document.getElementById('file-input');
+
+    /**
+     * 1. ЗАГРУЗКА ФАЙЛА
+     */
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                questions = JSON.parse(event.target.result);
+                startQuiz();
+            } catch (err) { alert("Ошибка: Неверный формат файла."); }
+        };
+        reader.readAsText(file);
+    });
+
+    /**
+     * 2. ИНИЦИАЛИЗАЦИЯ
+     */
+    function startQuiz() {
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.remove('hidden');
+        startTime = new Date();
+        timerInterval = setInterval(updateTimer, 1000);
+        renderQuestion();
+    }
+
+    /**
+     * 3. РЕНДЕРИНГ ВОПРОСА
+     * Обрабатывает: multiple_choice, true_false, fill_blank, short_answer, matching
+     */
+    function renderQuestion() {
+        const q = questions[currentIndex];
+        
+        // Обновляем прогресс и заголовок
+        document.getElementById('q-number').innerText = `Вопрос ${currentIndex + 1} из ${questions.length}`;
+        document.getElementById('progress-bar').style.width = `${((currentIndex + 1) / questions.length) * 100}%`;
+        document.getElementById('q-text').innerText = q.question || q.question_text || q.statement;
+
+        // Изображение
+        const img = document.getElementById('q-image');
+        if (q.image_url) { img.src = q.image_url; img.classList.remove('hidden'); }
+        else { img.classList.add('hidden'); }
+
+        // Сброс всех контейнеров
+        const optCont = document.getElementById('options-container');
+        const inpCont = document.getElementById('input-container');
+        const matchCont = document.getElementById('matching-container');
+        
+        optCont.innerHTML = '';
+        optCont.classList.add('hidden');
+        inpCont.classList.add('hidden');
+        matchCont.classList.add('hidden');
+
+        // Логика по типам
+        if (q.type === 'multiple_choice' || q.type === 'true_false') {
+            optCont.classList.remove('hidden');
+            const choices = q.type === 'multiple_choice' ? q.options : ["Верно", "Неверно"];
+            choices.forEach(choice => {
+                const btn = document.createElement('div');
+                btn.className = 'btn-opt';
+                btn.innerText = choice;
+                btn.onclick = () => checkAnswer(choice);
+                optCont.appendChild(btn);
+            });
+        } 
+        else if (q.type === 'fill_blank' || q.type === 'short_answer') {
+            inpCont.classList.remove('hidden');
+            document.getElementById('text-answer').value = '';
+            document.getElementById('text-answer').focus();
+        }
+        else if (q.type === 'matching') {
+            matchCont.classList.remove('hidden');
+            renderMatching(q);
+        }
+    }
+
+    /**
+     * 4. ЛОГИКА СОПОСТАВЛЕНИЯ (MATCHING)
+     */
+    function renderMatching(q) {
+        const leftBox = document.getElementById('match-left');
+        const rightBox = document.getElementById('match-right');
+        leftBox.innerHTML = ''; rightBox.innerHTML = '';
+        currentPairs = [];
+        selectedLeft = null;
+
+        // Перемешиваем правую колонку для честного теста
+        const shuffledRight = [...q.pairs].sort(() => Math.random() - 0.5);
+
+        q.pairs.forEach((pair, idx) => {
+            const lDiv = document.createElement('div');
+            lDiv.className = 'match-item';
+            lDiv.innerText = pair.left;
+            lDiv.dataset.id = idx;
+            lDiv.onclick = () => {
+                if (lDiv.classList.contains('paired')) return;
+                document.querySelectorAll('#match-left .match-item').forEach(i => i.classList.remove('selected'));
+                lDiv.classList.add('selected');
+                selectedLeft = { id: idx, element: lDiv };
+            };
+            leftBox.appendChild(lDiv);
+        });
+
+        shuffledRight.forEach((pair) => {
+            const rDiv = document.createElement('div');
+            rDiv.className = 'match-item';
+            rDiv.innerText = pair.right;
+            rDiv.onclick = () => {
+                if (!selectedLeft || rDiv.classList.contains('paired')) return;
+                
+                // Находим оригинальный индекс для проверки
+                const originalPair = q.pairs[selectedLeft.id];
+                const isCorrect = (originalPair.right === pair.right);
+                
+                currentPairs.push({ left: originalPair.left, right: pair.right, correct: isCorrect });
+                
+                selectedLeft.element.classList.add('paired');
+                rDiv.classList.add('paired');
+                selectedLeft = null;
+
+                if (currentPairs.length === q.pairs.length) {
+                    const allCorrect = currentPairs.every(p => p.correct);
+                    checkAnswer(allCorrect ? "Все верно" : "Есть ошибки", allCorrect);
+                }
+            };
+            rightBox.appendChild(rDiv);
+        });
+    }
+
+    /**
+     * 5. ПРОВЕРКА ОТВЕТА
+     */
+    function checkAnswer(userAnswer, matchingResult = null) {
+        const q = questions[currentIndex];
+        let isCorrect = false;
+
+        if (q.type === 'true_false') {
+            const val = (userAnswer === "Верно");
+            isCorrect = (val === q.correct_answer);
+        } else if (q.type === 'fill_blank' || q.type === 'short_answer') {
+            const cleanUser = userAnswer.trim().toLowerCase();
+            const cleanCorrect = q.correct_answer.toLowerCase();
+            isCorrect = (cleanUser === cleanCorrect);
+        } else if (q.type === 'matching') {
+            isCorrect = matchingResult;
+        } else {
+            isCorrect = (userAnswer === q.correct_answer);
+        }
+
+        if (isCorrect) score++;
+
+        userResults.push({
+            q: q.question || q.question_text || q.statement,
+            user: userAnswer,
+            correct: q.correct_answer,
+            isCorrect: isCorrect,
+            explanation: q.explanation || "Пояснение поможет лучше запомнить материал."
+        });
+
+        currentIndex++;
+        if (currentIndex < questions.length) renderQuestion();
+        else finishQuiz();
+    }
+
+    function submitTextAnswer() {
+        const val = document.getElementById('text-answer').value;
+        if (val) checkAnswer(val);
+    }
+
+    /**
+     * 6. ФИНАЛ И СТАТИСТИКА
+     */
+    function finishQuiz() {
+        clearInterval(timerInterval);
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('result-screen').classList.remove('hidden');
+
+        const time = document.getElementById('timer').innerText;
+        const percent = Math.round((score / questions.length) * 100);
+
+        document.getElementById('stats-summary').innerHTML = `
+            <h1 style="font-size: 48px; margin: 0; color: var(--primary);">${percent}%</h1>
+            <p>Ваш результат: <b>${score} из ${questions.length}</b></p>
+            <p>Затрачено времени: <b>${time.replace('Время: ', '')}</b></p>
+        `;
+
+        const log = document.getElementById('questions-log');
+        log.innerHTML = '';
+        userResults.forEach((res, i) => {
+            const item = document.createElement('div');
+            item.className = `history-item ${res.isCorrect ? 'correct' : 'wrong'}`;
+            item.innerHTML = `
+                <div style="font-weight: bold;">${i+1}. ${res.isCorrect ? '✅' : '❌'} ${res.q}</div>
+                ${!res.isCorrect ? `<div style="color:var(--danger); font-size: 0.9em; margin-top:5px;">Ответ: ${res.user} (Верно: ${res.correct})</div>` : ''}
+                <div style="font-size: 0.85em; color: #666; margin-top: 8px; font-style: italic;">💡 ${res.explanation}</div>
+            `;
+            log.appendChild(item);
+        });
+    }
+
+    function updateTimer() {
+        const diff = Math.floor((new Date() - startTime) / 1000);
+        const m = Math.floor(diff / 60);
+        const s = diff % 60;
+        document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+</script>
+
+</body>
+</html>
