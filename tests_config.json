@@ -4,9 +4,10 @@
       "id": "Chem_data_test",
       "name": "🧪 Химия",
       "tests": [
-        { "name": "Тест P1b", "file": "Chem_data_test/Chem_test_P1b.json" },
-        { "name": "Тест P2", "file": "Chem_data_test/Chem_test_P2.json" },
-        { "name": "Тест P4 (Mistral)", "file": "Chem_data_test/Chem_test_P4_Mistral.json" }
+        { "name": "Параграф_1", "file": "Chem_data_test/Chem_test_P1b.json" },
+        { "name": "Параграф_2", "file": "Chem_data_test/Chem_test_P2.json" },
+        { "name": "Параграф_5", "file": "Chem_data_test/Chem_test_P5.json" },
+        { "name": "Параграф_4", "file": "Chem_data_test/Chem_test_P4_Mistral.json" }
       ]
     },
     {
