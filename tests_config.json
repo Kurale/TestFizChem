@@ -7,6 +7,8 @@
         { "name": "Параграф_1", "file": "Chem_data_test/Chem_test_P1b.json" },
         { "name": "Параграф_2", "file": "Chem_data_test/Chem_test_P2.json" },
         { "name": "Параграф_5", "file": "Chem_data_test/Chem_test_P5.json" },
+        { "name": "Параграф_5_1", "file": "Chem_data_test/Chem_test_P5_1.json" },
+        { "name": "Параграф_6", "file": "Chem_data_test/Chem_test_P6.json" },
         { "name": "Параграф_4", "file": "Chem_data_test/Chem_test_P4_Mistral.json" }
       ]
     },
